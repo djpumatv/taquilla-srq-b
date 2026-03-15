@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Taquilla</title>
+
+<style>
+
+body{
+font-family:Arial;
+text-align:center;
+background:linear-gradient(135deg,#ffd800,#000000);
+min-height:100vh;
+}
+
+h1{
+font-size:60px;
+margin-top:20px;
+color:white;
+}
+
+h2.club{
+color:white;
+margin-top:-10px;
+margin-bottom:20px;
+}
+
+button{
+font-size:20px;
+padding:15px;
+margin:10px;
+width:230px;
+background:black;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+button:hover{
+background:#333;
+}
+
+input{
+font-size:18px;
+padding:10px;
+margin:10px;
+}
+
+.caja{
+background:white;
+padding:25px;
+border-radius:10px;
+display:inline-block;
+margin-top:10px;
+box-shadow:0px 0px 15px rgba(0,0,0,0.4);
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>TAQUILLA</h1>
+<h2 class="club">San Roque de Lepe B</h2>
+
+<div class="caja">
+
+<h2>TOTAL ENTRADAS: <span id="entradas">0</span></h2>
+<h2>NO SOCIOS: <span id="noSocios">0</span></h2>
+<h2>SOCIOS: <span id="socios">0</span></h2>
+<h2>CAJA TOTAL: <span id="dinero">0</span> €</h2>
+
+<br>
+
+<input id="cantidad" type="number" value="1" min="1">
+
+<br>
+
+<button onclick="ventaNormal()">Entrada normal</button>
+
+<br>
+
+<input id="socioNumero" placeholder="Número de socio">
+
+<br>
+
+<button onclick="ventaSocio()">Entrada socio</button>
+
+<br><br>
+
+<button onclick="descargar()">Descargar ventas</button>
+
+</div>
+
+<script>
+
+let precio = 5
+let entradas = 0
+let socios = 0
+let noSocios = 0
+let dinero = 0
+
+let ventas = []
+let listaSocios = []
+
+function actualizar(){
+
+document.getElementById("entradas").innerText = entradas
+document.getElementById("socios").innerText = socios
+document.getElementById("noSocios").innerText = noSocios
+document.getElementById("dinero").innerText = dinero
+
+}
+
+function ventaNormal(){
+
+let cantidad = parseInt(document.getElementById("cantidad").value)
+
+entradas += cantidad
+noSocios += cantidad
+dinero += cantidad * precio
+
+ventas.push({
+tipo:"normal",
+cantidad:cantidad
+})
+
+actualizar()
+
+}
+
+function ventaSocio(){
+
+let cantidad = parseInt(document.getElementById("cantidad").value)
+let socio = document.getElementById("socioNumero").value
+
+entradas += cantidad
+socios += cantidad
+
+for(let i=0;i<cantidad;i++){
+listaSocios.push(socio)
+}
+
+actualizar()
+
+document.getElementById("socioNumero").value=""
+
+}
+
+function descargar(){
+
+let normales = 0
+
+ventas.forEach(v=>{
+if(v.tipo=="normal"){
+normales += v.cantidad
+}
+})
+
+let csv = "entradas_normales;socios;dinero_total\n"
+
+let maxFilas = Math.max(1,listaSocios.length)
+
+for(let i=0;i<maxFilas;i++){
+
+let col1 = ""
+let col2 = ""
+let col3 = ""
+
+if(i==0){
+col1 = normales
+col3 = dinero
+}
+
+if(listaSocios[i]){
+col2 = listaSocios[i]
+}
+
+csv += col1 + ";" + col2 + ";" + col3 + "\n"
+
+}
+
+let blob = new Blob([csv], {type:"text/csv"})
+let a = document.createElement("a")
+
+a.href = URL.createObjectURL(blob)
+a.download = "ventas.csv"
+a.click()
+
+}
+
+</script>
+
+</body>
+</html>
